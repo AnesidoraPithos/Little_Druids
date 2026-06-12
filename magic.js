@@ -711,7 +711,7 @@
     '</svg>';
 
   function initWitheredWood() {
-    // Insert section between codex and ministry
+    // Insert section after ministry (so "Where to Find Us" stays right after the Codex)
     var ministrySection = document.querySelector('[aria-labelledby="ministry-title"]');
     if (!ministrySection) return;
 
@@ -728,7 +728,7 @@
       '</div>' +
       '<p class="grove-progress" id="woodProgressLine">the Wood is still\u2026</p>';
 
-    ministrySection.parentNode.insertBefore(section, ministrySection);
+    ministrySection.parentNode.insertBefore(section, ministrySection.nextSibling);
 
     var belief = feyState.get("belief");
     updateGrove(belief);
@@ -1008,7 +1008,9 @@
       '</div>' +
       '<div id="namingResult" aria-live="polite"></div>';
 
-    ministrySection.parentNode.insertBefore(section, ministrySection);
+    var wwEl = document.getElementById("witherWoodSection");
+    var npAnchor = wwEl || ministrySection;
+    npAnchor.parentNode.insertBefore(section, npAnchor.nextSibling);
 
     // Restore previous result
     var saved = feyState.get("trueNameInput");
@@ -1651,7 +1653,9 @@
         '</div>';
     }
 
-    ministrySection.parentNode.insertBefore(section, ministrySection);
+    var npEl = document.getElementById("namingPoolSection");
+    var scryAnchor = npEl || document.getElementById("witherWoodSection") || ministrySection;
+    scryAnchor.parentNode.insertBefore(section, scryAnchor.nextSibling);
 
     if (reducedMotion) return;
 
