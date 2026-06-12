@@ -934,8 +934,19 @@
     .card--faerie-home > .image-frame { height: 200px; }
   }
 
-  /* ---- Codex photo carousel ---- */
-  .codex-carousel {
+  /* ---- Logo image ---- */
+  .logo-img {
+    width: clamp(140px, 42vw, 220px);
+    height: auto;
+    border-radius: 3px;
+    transition: filter 1.2s ease;
+  }
+  body.fey-sight .logo-img {
+    filter: drop-shadow(0 0 10px rgba(212,165,184,0.6)) drop-shadow(0 0 18px rgba(74,93,35,0.25));
+  }
+
+  /* ---- Codex photo carousel + bazaar carousel ---- */
+  .codex-carousel, .bazaar-carousel {
     position: relative;
     width: 100%;
     height: 100%;
@@ -1035,7 +1046,9 @@
       </div>
 
       <div class="crest-row">
-        <svg class="crest" viewBox="0 0 140 84" fill="none" aria-hidden="true">
+        <img src="images/little_druids_logo.jpg" alt="Little Druids" class="logo-img"
+             onerror="this.style.display='none';this.nextElementSibling.removeAttribute('hidden')">
+        <svg class="crest" viewBox="0 0 140 84" fill="none" aria-hidden="true" hidden>
           <g stroke="#4A5D23" stroke-width="1.3" stroke-linecap="round">
             <!-- left wings -->
             <path d="M70 50 C46 24 20 26 22 44 C24 58 52 56 70 50 Z" fill="rgba(212,165,184,0.10)"/>
@@ -1147,16 +1160,18 @@
         <!-- Flower Bracelets -->
         <article class="card">
           <div class="image-frame">
-            <img src="images/bracelet.jpg" alt="Handmade flower bracelet woven at the booth" loading="lazy" class="frame-img" onerror="this.classList.add('broken')">
-            <svg class="botanical" viewBox="0 0 100 100" fill="none" stroke="#4A5D23" stroke-width="1.4" aria-hidden="true">
-              <ellipse cx="50" cy="52" rx="30" ry="22"/>
-              <g fill="#D4A5B8" stroke="#4A5D23" stroke-width="1">
-                <circle cx="22" cy="56" r="5"/><circle cx="50" cy="30" r="5"/><circle cx="78" cy="56" r="5"/><circle cx="50" cy="74" r="5"/>
-              </g>
-              <g fill="#4A5D23" stroke="none">
-                <circle cx="36" cy="38" r="2"/><circle cx="64" cy="38" r="2"/><circle cx="36" cy="68" r="2"/><circle cx="64" cy="68" r="2"/>
-              </g>
-            </svg>
+            <div class="bazaar-carousel" aria-label="Handmade flower bracelet photos">
+              <div class="carousel-track">
+                <img src="images/flower_bracelet_1.jpg" alt="Handmade flower bracelet" loading="lazy">
+                <img src="images/flower_bracelet_2.jpg" alt="Handmade flower bracelet, second view" loading="lazy">
+              </div>
+              <button class="carousel-btn carousel-prev" aria-label="Previous photo" type="button">&#8249;</button>
+              <button class="carousel-btn carousel-next" aria-label="Next photo" type="button">&#8250;</button>
+              <div class="carousel-dots">
+                <span class="carousel-dot active" aria-hidden="true"></span>
+                <span class="carousel-dot" aria-hidden="true"></span>
+              </div>
+            </div>
             <span class="frame-label">Bracelet</span>
           </div>
           <h3 class="card-title">Handmade Flower Bracelets <span class="spark" aria-hidden="true">✧</span></h3>
@@ -1405,6 +1420,27 @@
       });
     });
 
+    /* ---- Shared carousel init ---- */
+    function initCarousel(carousel) {
+      var track = carousel.querySelector(".carousel-track");
+      var dotEls = carousel.querySelectorAll(".carousel-dot");
+      var total = track.querySelectorAll("img").length;
+      var cur = 0;
+      function goTo(n) {
+        cur = (n + total) % total;
+        track.style.transform = "translateX(-" + (cur * 100) + "%)";
+        dotEls.forEach(function (d, j) { d.classList.toggle("active", j === cur); });
+      }
+      carousel.querySelector(".carousel-prev").addEventListener("click", function () { goTo(cur - 1); });
+      carousel.querySelector(".carousel-next").addEventListener("click", function () { goTo(cur + 1); });
+      var touchX = 0;
+      carousel.addEventListener("touchstart", function (e) { touchX = e.touches[0].clientX; }, { passive: true });
+      carousel.addEventListener("touchend", function (e) {
+        var dx = e.changedTouches[0].clientX - touchX;
+        if (Math.abs(dx) > 30) goTo(dx < 0 ? cur + 1 : cur - 1);
+      });
+    }
+
     /* ---- Botanical Codex: 10 specimens ---- */
     var fallbackSvg =
       '<svg class="botanical" viewBox="0 0 100 100" fill="none" stroke="#4A5D23" stroke-width="1.4" aria-hidden="true">' +
@@ -1530,37 +1566,17 @@
         trigger.setAttribute("aria-expanded", open ? "true" : "false");
       });
 
-      /* carousel logic */
       var carousel = card.querySelector(".codex-carousel");
-      if (carousel) {
-        var track = carousel.querySelector(".carousel-track");
-        var dotEls = carousel.querySelectorAll(".carousel-dot");
-        var total = s.imgs.length;
-        var cur = 0;
-
-        function goTo(n) {
-          cur = (n + total) % total;
-          track.style.transform = "translateX(-" + (cur * 100) + "%)";
-          dotEls.forEach(function (d, j) { d.classList.toggle("active", j === cur); });
-        }
-
-        carousel.querySelector(".carousel-prev").addEventListener("click", function () { goTo(cur - 1); });
-        carousel.querySelector(".carousel-next").addEventListener("click", function () { goTo(cur + 1); });
-
-        /* touch/swipe */
-        var touchX = 0;
-        carousel.addEventListener("touchstart", function (e) { touchX = e.touches[0].clientX; }, { passive: true });
-        carousel.addEventListener("touchend", function (e) {
-          var dx = e.changedTouches[0].clientX - touchX;
-          if (Math.abs(dx) > 30) goTo(dx < 0 ? cur + 1 : cur - 1);
-        });
-      }
+      if (carousel) initCarousel(carousel);
 
       card.classList.add("open");
       trigger.setAttribute("aria-expanded", "true");
 
       grid.appendChild(card);
     });
+
+    /* ---- Init static bazaar carousels (bracelet card, etc.) ---- */
+    document.querySelectorAll(".bazaar-carousel").forEach(initCarousel);
   })();
 </script>
 </body>
