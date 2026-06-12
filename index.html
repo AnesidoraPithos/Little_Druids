@@ -47,7 +47,7 @@
     background-color: var(--parchment);
     color: var(--ink);
     font-family: var(--font-body);
-    font-size: 18px;
+    font-size: 20px;
     line-height: 1.62;
     transition: var(--t-bg);
     position: relative;
@@ -272,7 +272,7 @@
     transition: transform 5s cubic-bezier(0.45, 0, 0.55, 1), opacity 1s ease;
     will-change: transform;
   }
-  body.fey-sight .fey-fairy { opacity: 1; }
+  body.fey-sight .fey-fairy { opacity: 1; pointer-events: auto; cursor: pointer; }
   .fairy-flip { transition: transform 0.6s ease; transform: scaleX(1); }
   .fairy-body { animation: fairyBob 3.2s ease-in-out infinite; }
   @keyframes fairyBob {
@@ -1069,6 +1069,10 @@ html.ld-night body.fey-sight .card { background: var(--cream); }
 html.ld-night body.fey-sight .codex-card { background: var(--cream); }
 html.ld-night body.fey-sight .cast-btn { background: var(--cream); }
 
+/* Accordion + charter: override hardcoded light backgrounds */
+html.ld-night .accordion { background: rgba(107, 138, 53, 0.08); }
+html.ld-night .charter { background: rgba(107, 138, 53, 0.08); }
+
 /* Product photos: NEVER tinted */
 html.ld-night .frame-img,
 html.ld-night .image-frame img,
@@ -1231,7 +1235,7 @@ html.ld-night .night-note { display: inline; }
   border: 2px solid var(--gold);
   box-shadow: 0 0 18px rgba(184,150,90,0.25);
   max-width: min(320px, 90vw);
-  touch-action: none; cursor: crosshair;
+  touch-action: pan-y; cursor: crosshair;
   display: block;
 }
 .scry-vision {
@@ -1638,7 +1642,7 @@ html.ld-night .night-note { display: inline; }
     <section class="section" aria-labelledby="ministry-title">
       <div class="druid-sigil" aria-hidden="true"></div>
       <div class="section-head"><h2 class="section-title" id="ministry-title">Where to Find Us</h2></div>
-      <p class="section-sub">seek the moss-keeper beneath the open sky <span class="spark" aria-hidden="true">✧</span></p>
+      <p class="section-sub">seek the faeries beneath the open sky <span class="spark" aria-hidden="true">✧</span></p>
 
       <div class="card ministry-card">
         <div class="ministry-grid">

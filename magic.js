@@ -86,7 +86,6 @@
   var lastTs = 0;
   var gravityFlip = false;
   var _nightActive = false; // set by day/night module
-  var _wildshapeAnimating = false; // set by wildshape module
 
   function resizeCanvas() {
     if (!canvas) return;
@@ -97,7 +96,7 @@
   window.addEventListener("resize", resizeCanvas, { passive: true });
 
   function needsContinuousRender() {
-    return _nightActive || _wildshapeAnimating;
+    return _nightActive;
   }
 
   function spawnParticle(opts) {
@@ -335,7 +334,6 @@
       btn.textContent = on ? "[ \u2600 Day ]" : "[ \u263D Night ]";
       btn.setAttribute("aria-pressed", on ? "true" : "false");
     }
-    feyState.set("night", on);
     if (on) startFireflies(); else stopFireflies();
   }
 
@@ -357,7 +355,9 @@
     applyNightMode(isNight);
 
     btn.addEventListener("click", function () {
-      applyNightMode(!document.documentElement.classList.contains("ld-night"));
+      var next = !document.documentElement.classList.contains("ld-night");
+      feyState.set("night", next);
+      applyNightMode(next);
     });
   }
 
@@ -605,13 +605,6 @@
     document.addEventListener("click", function (e) {
       maybeWildMagic(e.target, e.clientX, e.clientY);
     });
-    document.addEventListener("touchend", function (e) {
-      if (e.changedTouches && e.changedTouches.length) {
-        maybeWildMagic(e.target,
-          e.changedTouches[0].clientX,
-          e.changedTouches[0].clientY);
-      }
-    }, { passive: true });
   }
 
   /* ----------------------------------------------------------------
@@ -749,7 +742,11 @@
         var rect = el.getBoundingClientRect();
         spawnBurst(rect.left + rect.width / 2, rect.top + rect.height / 2, 8, "spark", "#d4b069");
         grantBelief("hiddenSparks");
-        showSurgeToast("\u2727 a thread of belief found \u2727");
+        var count = feyState.get("beliefLog").hiddenSparks;
+        var sparkMsg = count >= 3
+          ? "\u2727 a thread of belief found \u2727"
+          : "\u2727 a hidden spark\u2026 " + count + " of 3 \u2727";
+        showSurgeToast(sparkMsg);
       });
     });
 
@@ -1348,15 +1345,15 @@
     '</svg>';
 
   var SHAPES = [
-    { id:"butterfly", svg: BUTTERFLY_SVG, moveFn: "flutter" },
-    { id:"wisp",      svg: WISP_SVG,      moveFn: "drift" },
-    { id:"stag",      svg: STAG_SVG,      moveFn: "bound" },
-    { id:"frog",      svg: FROG_SVG,      moveFn: "hop" }
+    { id:"butterfly", svg: BUTTERFLY_SVG },
+    { id:"wisp",      svg: WISP_SVG },
+    { id:"stag",      svg: STAG_SVG },
+    { id:"frog",      svg: FROG_SVG }
   ];
 
   var _currentForm = "fairy";
   var _wildshapeTimer = null;
-  var _wildshapeMoveRaf = null;
+  var _wildshapeRevertTimer = null;
   var _fairy = document.querySelector(".fey-fairy");
   var _fairyFlip = _fairy ? _fairy.querySelector(".fairy-flip") : null;
   var _wildshapeOverlay = null;
@@ -1367,10 +1364,6 @@
     _wildshapeOverlay.id = "wildshapeOverlay";
     _wildshapeOverlay.hidden = true;
     _fairy.appendChild(_wildshapeOverlay);
-    // Make fairy tappable
-    _fairy.style.pointerEvents = "auto";
-    _fairy.style.cursor = "pointer";
-
     _fairy.addEventListener("click", function () {
       if (!document.body.classList.contains("fey-sight")) return;
       var now = Date.now();
@@ -1400,16 +1393,20 @@
         _wildshapeOverlay.innerHTML = next.svg;
         _wildshapeOverlay.hidden = false;
       }
-      _wildshapeAnimating = true;
+      var revertDelay = 8000 + Math.random() * 4000;
+      _wildshapeRevertTimer = setTimeout(function () {
+        _wildshapeRevertTimer = null;
+        if (_currentForm !== "fairy") doWildshape(false);
+      }, revertDelay);
     } else {
       // Return to fairy
+      if (_wildshapeRevertTimer) { clearTimeout(_wildshapeRevertTimer); _wildshapeRevertTimer = null; }
       _currentForm = "fairy";
       if (_fairyFlip) _fairyFlip.hidden = false;
       if (_wildshapeOverlay) {
         _wildshapeOverlay.innerHTML = "";
         _wildshapeOverlay.hidden = true;
       }
-      _wildshapeAnimating = false;
     }
   }
 
@@ -1428,8 +1425,8 @@
       _currentForm = "fairy";
       if (_fairyFlip) _fairyFlip.hidden = false;
       if (_wildshapeOverlay) { _wildshapeOverlay.innerHTML = ""; _wildshapeOverlay.hidden = true; }
-      _wildshapeAnimating = false;
     }
+    if (_wildshapeRevertTimer) { clearTimeout(_wildshapeRevertTimer); _wildshapeRevertTimer = null; }
     if (_wildshapeTimer) { clearTimeout(_wildshapeTimer); _wildshapeTimer = null; }
   }
 
@@ -1519,6 +1516,7 @@
     ctx.stroke();
     ctx.restore();
     this.poolImageData = ctx.getImageData(0, 0, W, H);
+    this.renderImageData = ctx.createImageData(W, H);
   };
 
   ScryPool.prototype.addRipple = function (bx, by, strength) {
@@ -1550,7 +1548,7 @@
     var buf = this.buf0;
     var scale = W / bW;
 
-    var imgData = ctx.createImageData(W, H);
+    var imgData = this.renderImageData;
     var pix = imgData.data;
     var src = pool.data;
 
