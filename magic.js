@@ -1703,6 +1703,66 @@
   }
 
   /* ----------------------------------------------------------------
+     12. LIGHTBOX
+  ---------------------------------------------------------------- */
+  function initLightbox() {
+    // Build overlay
+    var lb = document.createElement("div");
+    lb.id = "feyLightbox";
+    lb.setAttribute("role", "dialog");
+    lb.setAttribute("aria-modal", "true");
+    lb.setAttribute("aria-label", "Image viewer");
+    lb.innerHTML =
+      '<button id="feyLightboxClose" type="button" aria-label="Close">\u00d7 close</button>' +
+      '<img id="feyLightboxImg" alt="" />';
+    document.body.appendChild(lb);
+
+    var img = document.getElementById("feyLightboxImg");
+
+    function openLightbox(src, alt) {
+      img.src = src;
+      img.alt = alt || "";
+      lb.classList.add("open");
+      document.addEventListener("keydown", onKey);
+    }
+
+    function closeLightbox() {
+      lb.classList.remove("open");
+      document.removeEventListener("keydown", onKey);
+      // Clear src after transition so old image doesn't flash next open
+      setTimeout(function () { if (!lb.classList.contains("open")) img.src = ""; }, 260);
+    }
+
+    function onKey(e) { if (e.key === "Escape") closeLightbox(); }
+
+    // Close on backdrop click (not on the image itself)
+    lb.addEventListener("click", function (e) {
+      if (e.target === lb) closeLightbox();
+    });
+    document.getElementById("feyLightboxClose").addEventListener("click", closeLightbox);
+
+    // Attach to all qualifying images — use event delegation on document
+    // so it also catches carousel images loaded dynamically
+    var touchMoved = false;
+    document.addEventListener("touchstart", function () { touchMoved = false; }, { passive: true });
+    document.addEventListener("touchmove",  function () { touchMoved = true;  }, { passive: true });
+
+    document.addEventListener("click", function (e) {
+      if (touchMoved) return; // was a swipe, not a tap
+      var target = e.target;
+      if (target.tagName !== "IMG") return;
+      // Only images inside image frames or carousels
+      var inFrame    = target.closest(".image-frame");
+      var inCarousel = target.closest(".carousel-track");
+      if (!inFrame && !inCarousel) return;
+      // Don't open if it's the broken-image fallback (no src)
+      if (!target.src || target.classList.contains("broken")) return;
+      e.stopPropagation(); // don't let carousel swipe logic misfire
+      openLightbox(target.src, target.alt);
+    });
+  }
+
+  /* ----------------------------------------------------------------
      INIT — lazy via DOMContentLoaded (magic.js is deferred so DOM ready)
   ---------------------------------------------------------------- */
   function init() {
@@ -1715,6 +1775,7 @@
     initLivingCodex();
     initWildshape();
     initScryingPool();
+    initLightbox();
   }
 
   if (document.readyState === "loading") {
