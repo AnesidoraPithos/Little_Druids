@@ -1122,17 +1122,22 @@
         <!-- Fresh Blooms -->
         <article class="card">
           <div class="image-frame">
-            <img src="images/blooms.jpg" alt="Fresh gerbera blooms cut at dawn" loading="lazy" class="frame-img" onerror="this.classList.add('broken')">
-            <svg class="botanical" viewBox="0 0 100 100" fill="none" stroke="#4A5D23" stroke-width="1.4" aria-hidden="true">
-              <circle cx="50" cy="34" r="9"/>
-              <g stroke-linecap="round">
-                <path d="M50 34 L50 12"/><path d="M50 34 L31 20"/><path d="M50 34 L69 20"/>
-                <path d="M50 34 L28 38"/><path d="M50 34 L72 38"/><path d="M50 34 L36 51"/><path d="M50 34 L64 51"/><path d="M50 34 L50 56"/>
-              </g>
-              <path d="M50 43 L50 92" stroke-width="1.6"/>
-              <path d="M50 64 C40 60 33 64 30 72 C40 74 47 70 50 64Z"/>
-              <path d="M50 76 C60 72 67 76 70 84 C60 86 53 82 50 76Z"/>
-            </svg>
+            <div class="bazaar-carousel" aria-label="Fresh gerbera bloom photos">
+              <div class="carousel-track">
+                <img src="images/gerbera_main.jpg" alt="Fresh gerbera blooms" loading="lazy">
+                <img src="images/gerbera_1.jpg" alt="Fresh gerbera blooms, second view" loading="lazy">
+                <img src="images/gerbera_2.jpg" alt="Fresh gerbera blooms, third view" loading="lazy">
+                <img src="images/gerbera_3.jpg" alt="Fresh gerbera blooms, fourth view" loading="lazy">
+              </div>
+              <button class="carousel-btn carousel-prev" aria-label="Previous photo" type="button">&#8249;</button>
+              <button class="carousel-btn carousel-next" aria-label="Next photo" type="button">&#8250;</button>
+              <div class="carousel-dots">
+                <span class="carousel-dot active" aria-hidden="true"></span>
+                <span class="carousel-dot" aria-hidden="true"></span>
+                <span class="carousel-dot" aria-hidden="true"></span>
+                <span class="carousel-dot" aria-hidden="true"></span>
+              </div>
+            </div>
             <span class="frame-label">Fresh Bloom</span>
           </div>
           <h3 class="card-title">Fresh Blooms <span class="spark" aria-hidden="true">✧</span></h3>
