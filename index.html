@@ -933,6 +933,69 @@
     .card--faerie-home { grid-column: 1 / -1; }
     .card--faerie-home > .image-frame { height: 200px; }
   }
+
+  /* ---- Codex photo carousel ---- */
+  .codex-carousel {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  .carousel-track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.3s ease;
+    will-change: transform;
+  }
+  .carousel-track img {
+    flex: none;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .carousel-btn {
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 26px;
+    background: rgba(30,30,20,0.28);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255,255,255,0.92);
+    font-size: 1.1rem;
+    padding: 0;
+    z-index: 2;
+    transition: background 0.15s;
+    line-height: 1;
+  }
+  .carousel-btn:hover { background: rgba(30,30,20,0.52); }
+  .carousel-btn:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: -2px; }
+  .carousel-prev { left: 0; }
+  .carousel-next { right: 0; }
+  .carousel-dots {
+    position: absolute;
+    bottom: 5px;
+    left: 0; right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .carousel-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.45);
+    transition: background 0.2s;
+  }
+  .carousel-dot.active { background: rgba(255,255,255,0.95); }
+  @media (prefers-reduced-motion: reduce) {
+    .carousel-track { transition: none; }
+  }
 </style>
 </head>
 <body>
@@ -1342,40 +1405,75 @@
       });
     });
 
-    /* ---- Botanical Codex: 8 specimens ---- */
+    /* ---- Botanical Codex: 10 specimens ---- */
+    var fallbackSvg =
+      '<svg class="botanical" viewBox="0 0 100 100" fill="none" stroke="#4A5D23" stroke-width="1.4" aria-hidden="true">' +
+        '<circle cx="50" cy="34" r="9"/>' +
+        '<g stroke-linecap="round"><path d="M50 34 L50 12"/><path d="M50 34 L31 20"/><path d="M50 34 L69 20"/></g>' +
+        '<path d="M50 43 L50 92" stroke-width="1.6"/>' +
+      '</svg>';
+
     var specimens = [
-      { name: "Venus Flytraps", img: "images/codex-venus-flytrap.jpg", age: "6 months old",
+      { name: "Venus Flytraps",
+        imgs: ["images/venus_close_up.jpg","images/venus_close_up_2.jpg","images/venus_far_shot.jpg","images/venus_far_shot_2.jpg","images/venus_flytrap_far_shot.jpg"],
+        age: "6 months old",
         light: "Full direct sun.",
         water: "Distilled water or rainwater ONLY. Keep soil moist as they love water.",
         rule: "Do not force traps closed manually." },
-      { name: "Alba Moonshadow Succulents", img: "images/codex-alba-moonshadow.jpg", age: "",
+      { name: "Alba Moonshadow Succulents",
+        imgs: ["images/alba_moonshadow.jpg"],
+        age: "",
         light: "Bright indirect / morning sun.",
         water: "Strict soak-and-dry.",
         rule: "Keep water out of the center rosette." },
-      { name: "Pink Moonstone Pachyphytum", img: "images/codex-pink-moonstone.jpg", age: "",
+      { name: "Pink Moonstone Pachyphytum",
+        imgs: ["images/pink_moonstone.jpg"],
+        age: "",
         light: "High direct sun (brings out the pink blush).",
         water: "Only when the lower leaves wrinkle. Extreme drought tolerance.",
         rule: "" },
-      { name: "Callisia Repens 'Pink Lady'", img: "images/codex-callisia-pink-lady.jpg", age: "",
+      { name: "Callisia Repens 'Pink Lady'",
+        imgs: ["images/pink_lady.jpg","images/pink_lady_2.jpg","images/pink_lady_3.jpg"],
+        age: "",
         light: "Bright filtered light.",
         water: "Keep lightly and evenly moist.",
         rule: "Trim regularly to stay bushy." },
-      { name: "Sedum Japonicum 'Tokyo Sun'", img: "images/codex-tokyo-sun.jpg", age: "",
+      { name: "Sedum Japonicum 'Tokyo Sun'",
+        imgs: ["images/tokyo_sun.jpg","images/tokyo_sun_2.jpg","images/tokyo_sun_3.jpg","images/tokyo_sun_4.jpg","images/tokyo_sun_5.jpg"],
+        age: "",
         light: "Full direct sun (maintains the neon yellow).",
         water: "Shallow, regular watering due to fine root systems.",
         rule: "" },
-      { name: "Pink Fittonias", img: "images/codex-pink-fittonia.jpg", age: "",
+      { name: "Pink Fittonias",
+        imgs: ["images/fittonia.jpg","images/fittonia_2.jpg"],
+        age: "",
         light: "Medium to low shade.",
         water: "High humidity — keep damp.",
         rule: "Highly dramatic — will faint when dry, but revives quickly after a drink." },
-      { name: "Burrito Succulents", img: "images/codex-burrito.jpg", age: "",
+      { name: "Burrito Succulents",
+        imgs: ["images/burrito.jpg"],
+        age: "",
         light: "Bright indirect light.",
         water: "Soak and dry completely.",
         rule: "Leaves drop very easily — place where it won't be bumped." },
-      { name: "Pink Sunrise Succulents", img: "images/codex-pink-sunrise.jpg", age: "",
+      { name: "Pink Sunrise Succulents",
+        imgs: ["images/sunrise.jpg","images/sunrise_2.jpg","images/sunrise_3.jpg"],
+        age: "",
         light: "Direct morning sun for magenta coloring.",
         water: "Deep but infrequent.",
-        rule: "Fine white stem hairs are natural water-catchers, not pests!" }
+        rule: "Fine white stem hairs are natural water-catchers, not pests!" },
+      { name: "Sedum Makinoi",
+        imgs: ["images/sedum_makinoi.jpg"],
+        age: "",
+        light: "Bright indirect to full sun.",
+        water: "Soak and dry; drought tolerant once established.",
+        rule: "" },
+      { name: "Aeonium",
+        imgs: ["images/aeonium_close_up.jpg","images/aeonium_far_shot.jpg"],
+        age: "",
+        light: "Bright indirect / morning sun.",
+        water: "Water when top inch of soil dries out; reduce in summer.",
+        rule: "Goes dormant in summer heat — leaves may curl inward; this is normal." }
     ];
 
     var grid = document.getElementById("codexGrid");
@@ -1392,6 +1490,29 @@
 
       var age = s.age ? '<span class="age">' + s.age + "</span>" : "";
 
+      var photoHtml;
+      if (s.imgs.length === 1) {
+        photoHtml =
+          '<div class="image-frame" style="width:100%;height:100%;margin-bottom:0;">' +
+            '<img src="' + s.imgs[0] + '" alt="' + s.name + '" loading="lazy" class="frame-img" onerror="this.classList.add(\'broken\')">' +
+            fallbackSvg +
+          '</div>';
+      } else {
+        var trackImgs = s.imgs.map(function (src, idx) {
+          return '<img src="' + src + '" alt="' + s.name + ' — photo ' + (idx + 1) + ' of ' + s.imgs.length + '" loading="lazy">';
+        }).join('');
+        var dotSpans = s.imgs.map(function (_, idx) {
+          return '<span class="carousel-dot' + (idx === 0 ? ' active' : '') + '" aria-hidden="true"></span>';
+        }).join('');
+        photoHtml =
+          '<div class="codex-carousel" aria-label="' + s.name + ' photos">' +
+            '<div class="carousel-track">' + trackImgs + '</div>' +
+            '<button class="carousel-btn carousel-prev" aria-label="Previous photo" type="button">&#8249;</button>' +
+            '<button class="carousel-btn carousel-next" aria-label="Next photo" type="button">&#8250;</button>' +
+            '<div class="carousel-dots">' + dotSpans + '</div>' +
+          '</div>';
+      }
+
       card.innerHTML =
         '<button class="codex-trigger" type="button" aria-expanded="false">' +
           '<span class="codex-dot" aria-hidden="true"></span>' +
@@ -1399,16 +1520,7 @@
           '<span class="chev" aria-hidden="true">›</span>' +
         "</button>" +
         '<div class="codex-panel"><div><div class="codex-body">' +
-          '<div class="codex-photo">' +
-            '<div class="image-frame" style="width:100%;height:100%;margin-bottom:0;">' +
-              '<img src="' + s.img + '" alt="' + s.name + '" loading="lazy" class="frame-img" onerror="this.classList.add(\'broken\')">' +
-              '<svg class="botanical" viewBox="0 0 100 100" fill="none" stroke="#4A5D23" stroke-width="1.4" aria-hidden="true">' +
-                '<circle cx="50" cy="34" r="9"/>' +
-                '<g stroke-linecap="round"><path d="M50 34 L50 12"/><path d="M50 34 L31 20"/><path d="M50 34 L69 20"/></g>' +
-                '<path d="M50 43 L50 92" stroke-width="1.6"/>' +
-              '</svg>' +
-            '</div>' +
-          "</div>" +
+          '<div class="codex-photo">' + photoHtml + '</div>' +
           '<div class="codex-care">' + rows + "</div>" +
         "</div></div></div>";
 
@@ -1417,6 +1529,32 @@
         var open = card.classList.toggle("open");
         trigger.setAttribute("aria-expanded", open ? "true" : "false");
       });
+
+      /* carousel logic */
+      var carousel = card.querySelector(".codex-carousel");
+      if (carousel) {
+        var track = carousel.querySelector(".carousel-track");
+        var dotEls = carousel.querySelectorAll(".carousel-dot");
+        var total = s.imgs.length;
+        var cur = 0;
+
+        function goTo(n) {
+          cur = (n + total) % total;
+          track.style.transform = "translateX(-" + (cur * 100) + "%)";
+          dotEls.forEach(function (d, j) { d.classList.toggle("active", j === cur); });
+        }
+
+        carousel.querySelector(".carousel-prev").addEventListener("click", function () { goTo(cur - 1); });
+        carousel.querySelector(".carousel-next").addEventListener("click", function () { goTo(cur + 1); });
+
+        /* touch/swipe */
+        var touchX = 0;
+        carousel.addEventListener("touchstart", function (e) { touchX = e.touches[0].clientX; }, { passive: true });
+        carousel.addEventListener("touchend", function (e) {
+          var dx = e.changedTouches[0].clientX - touchX;
+          if (Math.abs(dx) > 30) goTo(dx < 0 ? cur + 1 : cur - 1);
+        });
+      }
 
       if (i === 0) {
         card.classList.add("open");
