@@ -945,6 +945,36 @@
     filter: drop-shadow(0 0 10px rgba(212,165,184,0.6)) drop-shadow(0 0 18px rgba(74,93,35,0.25));
   }
 
+  /* ---- Seed bomb botanical manifest ---- */
+  .seed-manifest { display: flex; flex-direction: column; gap: 12px; }
+  .seed-family { }
+  .seed-family-name {
+    font-family: var(--font-head);
+    font-size: 0.68rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--moss-deep);
+    margin: 0 0 5px;
+  }
+  .seed-varieties {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .seed-varieties li {
+    font-size: 0.9rem;
+    padding: 3px 0;
+    border-bottom: 1px dotted rgba(74,93,35,0.18);
+    line-height: 1.45;
+  }
+  .seed-varieties li:last-child { border-bottom: none; }
+  .seed-aka {
+    display: block;
+    font-style: italic;
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+  }
+
   /* ---- Codex photo carousel + bazaar carousel ---- */
   .codex-carousel, .bazaar-carousel {
     position: relative;
@@ -1157,6 +1187,57 @@
               </ol>
             </div></div></div>
           </div>
+
+          <div class="accordion" data-accordion>
+            <button class="acc-trigger" type="button" aria-expanded="false">
+              <span>[ The Botanical Manifest ]</span>
+              <span class="chev" aria-hidden="true">›</span>
+            </button>
+            <div class="acc-panel"><div class="acc-inner"><div class="acc-body">
+              <p style="font-style:italic;font-size:0.88rem;color:var(--ink-soft);margin:0 0 12px;">Each orb may carry seeds of any of these enchanted strains:</p>
+              <div class="seed-manifest">
+
+                <div class="seed-family">
+                  <p class="seed-family-name">Zinnia</p>
+                  <ul class="seed-varieties">
+                    <li>Zinnia Dahlia flowered Mix <span class="seed-aka">Reuzen Zinnia · Zinnia élégant à fleurs doubles</span></li>
+                    <li>Zinnia Lilliput Mix <span class="seed-aka">Pompon Zinnia · Zinnia élégant à fleurs doubles</span></li>
+                    <li>Common Zinnia</li>
+                    <li>Zinnia elegans</li>
+                  </ul>
+                </div>
+
+                <div class="seed-family">
+                  <p class="seed-family-name">Cosmos</p>
+                  <ul class="seed-varieties">
+                    <li>Cosmos Sea Shells Mix <span class="seed-aka">Cosmos, grootbloemig · Cosmos bipinné à grandes fleurs</span></li>
+                    <li>Garden Cosmos</li>
+                    <li>Mexican Aster</li>
+                    <li>Cosmos bipinnatus</li>
+                  </ul>
+                </div>
+
+                <div class="seed-family">
+                  <p class="seed-family-name">Marigold</p>
+                  <ul class="seed-varieties">
+                    <li>Bonita Mix</li>
+                    <li>French Marigold, dwarf double <span class="seed-aka">Afrikaantjes, lage dubbele · Tagète Oeillet d'Inde, naine double</span></li>
+                    <li>Tagetes patula</li>
+                  </ul>
+                </div>
+
+                <div class="seed-family">
+                  <p class="seed-family-name">Portulaca / Purslane</p>
+                  <ul class="seed-varieties">
+                    <li>Portulaca A Fiori Semplici Multicolor</li>
+                    <li>Purslane <span class="seed-aka">Pourpier · Portulak · Verdolaga · Портулак</span></li>
+                  </ul>
+                </div>
+
+              </div>
+            </div></div></div>
+          </div>
+
           <span class="fey-note">the clay still remembers the wild meadow it was gathered from</span>
         </article>
 
